@@ -2,10 +2,11 @@ import requests as req
 import json
 import sys
 import time
+import os
 from string import Template
 
 # Configuration you can update
-discord_webhook_url = "<REPLACE WITH YOUR OWN>"
+discord_webhook_url = os.getenv("GOG_BOT_DISCORD_WEBHOOK")
 loop_frequency = 60 # in seconds
 
 # Configuration you shouldn't update
@@ -29,13 +30,19 @@ def get_listings():
     headers = {"x-api-key": gog_api_key}
     path = "/dev/all-orders?tokenAddress=GuildOfGuardians"
     res = req.get(gog_base_url + path, headers=headers)
-    listings = json.loads(res.text)
-    formatted_listings = []
 
-    for listing in listings:
-        formatted_listings.append(format_listing(listing))
+    if res.status_code == 200:
+        listings = json.loads(res.text)
+        formatted_listings = []
 
-    return formatted_listings
+        for listing in listings:
+            if listing["metadata"] != None:
+                formatted_listings.append(format_listing(listing))
+
+        return formatted_listings
+    else:
+        print("Failed to get listings", res.status_code, res.text)
+        return []
 
 def format_listing(listing):
     metadata = json.loads(listing["metadata"])
@@ -103,10 +110,10 @@ while True:
         start = time.time()
         run()
         end = time.time()
-    except:
+        print("Looped:", end - start, "seconds")
+    except Exception as e:
         print("Failed to run")
-
-    print("Looped:", end - start, "seconds")
+        print(e)
 
     time.sleep(loop_frequency)
 

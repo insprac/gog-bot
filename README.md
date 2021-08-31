@@ -10,11 +10,16 @@ Be aware that there is very little error handling and logging.
 
 ### Setup
 
-Update the configuation with your own Discord webhook URL and set the loop
-frequency (60 seconds by default).
+A Discord webhook URL is required as an environment variable.
+
+```bash
+export GOG_BOT_DISCORD_WEBHOOK="<your webhook URL>"
+```
+
+The loop frequency can be updated at the top of the file, the default is 60
+seconds.
 
 ```python
-discord_webhook_url = "<REPLACE WITH YOUR OWN>"
 loop_frequency = 60
 ```
 
